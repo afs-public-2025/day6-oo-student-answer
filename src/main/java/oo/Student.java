@@ -1,42 +1,38 @@
 package oo;
 
-public class Student extends Person implements LeaderAssignObverse{
+public class Student extends Person implements AssignLeaderObserver{
     private Klass klass;
 
-    public Klass getKlass() {
-        return klass;
-    }
-
-    public Student(Integer id, String name, Integer age) {
+    public Student(int id, String name, int age) {
         super(id, name, age);
     }
 
-    @Override
     public String introduce() {
-        Boolean isLeader = this.klass.getLeader().equals(this);
-        if (isLeader) {
-            return String.format("My name is %s. I am %d years old. I am a student. I am the leader of class %d.", getName(), getAge(), klass.getId());
-        } else {
-            return String.format("My name is %s. I am %d years old. I am a student. I am in class %d.", getName(), getAge(), klass.getId());
+        if (klass != null && klass.isLeader(this)) {
+            return super.introduce() + " I am a student. I am Leader of class %d.".formatted(klass.getNumber());
         }
+        if (klass != null) {
+            return super.introduce() + " I am a student. I am in class %d.".formatted(klass.getNumber());
+        }
+        return super.introduce() + " I am a student.";
+    }
+
+    public boolean isIn(Klass klass) {
+        if (this.klass != null) {
+            return this.klass.equals(klass);
+        }
+        return false;
     }
 
     public void join(Klass klass) {
         this.klass = klass;
-        klass.attach(this);
-    }
-
-    public boolean isIn(Klass klass) {
-        if (this.klass == null) {
-            return false;
-        }
-        return this.klass.equals(klass);
+        klass.attachAssignLeaderObserver(this);
     }
 
     @Override
-    public void onLeaderAssign(Student student, Klass klass) {
-        if (this.klass.equals(klass) && !this.equals(student)){
-            System.out.println(String.format("I am %s, student of Class %d. I know %s become Leader.", this.getName(), this.klass.getId(), student.getName()));
-        }
+    public void notifyAssignLeader(Klass klass) {
+        String message = "I am %s, student of Class %d. I know %s become Leader."
+                .formatted(name, klass.getNumber(), klass.getLeaderName());
+        System.out.println(message);
     }
 }

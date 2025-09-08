@@ -2,60 +2,54 @@ package oo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Klass {
-    private Integer id;
+    private final int number;
     private Student leader;
-    private List<LeaderAssignObverse> leaderAssignObverses = new ArrayList<>();
+    private final List<AssignLeaderObserver> assignLeaderOverseers = new ArrayList<>();
 
-    public Student getLeader() {
-        return leader;
+    public Klass(int number) {
+        this.number = number;
     }
 
-    public Klass(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void attach(LeaderAssignObverse leaderAssignObverse){
-        this.leaderAssignObverses.add(leaderAssignObverse);
+    public int getNumber() {
+        return number;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        }
-        Klass klass = (Klass) obj;
-        return id == klass.id;
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Klass klass = (Klass) o;
+        return number == klass.number;
     }
 
     @Override
     public int hashCode() {
-        return id;
+        return Objects.hashCode(number);
     }
 
-    public void assignLeader(Student tom) {
-        if (tom.isIn(this)) {
-            this.leader = tom;
-            for(LeaderAssignObverse leaderAssignObverse: leaderAssignObverses){
-                leaderAssignObverse.onLeaderAssign(tom,this);
+    public void assignLeader(Student student) {
+        if (!student.isIn(this)) {
+            throw new RuntimeException("It is not one of us.");
+        }
+        this.leader = student;
+        for (AssignLeaderObserver observer : assignLeaderOverseers) {
+            if (!observer.equals(student)) {
+                observer.notifyAssignLeader(this);
             }
-        }else{
-            System.out.println("It is not one of us.");
         }
     }
 
-    public boolean isLeader(Student tom) {
-        if (this.leader == null) {
-            return false;
-        }
-        if (this.leader.equals(tom)) {
-            return true;
-        }
-        return false;
+    public boolean isLeader(Student student) {
+        return student.equals(leader);
+    }
+
+    public String getLeaderName() {
+        return leader.getName();
+    }
+
+    public void attachAssignLeaderObserver(AssignLeaderObserver observer) {
+        assignLeaderOverseers.add(observer);
     }
 }

@@ -2,48 +2,50 @@ package oo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class Teacher extends Person implements LeaderAssignObverse{
+public class Teacher extends Person implements AssignLeaderObserver {
     private List<Klass> klasses = new ArrayList<>();
 
-    public Teacher(Integer id, String name, Integer age) {
+    public Teacher(int id, String name, int age) {
         super(id, name, age);
     }
 
-    @Override
     public String introduce() {
-        return String.format("My name is %s. I am %d years old. I am a teacher. I teach Class %s."
-                , getName()
-                , getAge()
-                , klasses.stream().map(klass -> klass.getId().toString()).collect(Collectors.joining(", ")));
+        if (klasses.isEmpty()) {
+            return super.introduce() + " I am a teacher.";
+        }
+        StringBuilder classNumbers = new StringBuilder();
+        for (Klass klass : klasses) {
+            if (!classNumbers.isEmpty()) {
+                classNumbers.append(", ");
+            }
+            classNumbers.append(klass.getNumber());
+        }
+        return super.introduce() + " I am a teacher. I teach class " + classNumbers + ".";
     }
-//    My name is Jerry. I am 21 years old. I am a teacher. I teach Class 1.
 
     public void assignTo(Klass klass) {
         this.klasses.add(klass);
-        klass.attach(this);
+        klass.attachAssignLeaderObserver(this);
     }
 
     public boolean belongsTo(Klass klass) {
-        for (Klass klassTmp : klasses) {
-            if (klassTmp.equals(klass)) return true;
-        }
-        return false;
+        return this.klasses.contains(klass);
     }
 
-    public boolean isTeaching(Student tom) {
-        for (Klass klassTmp : klasses) {
-            if (klassTmp.equals(tom.getKlass())) return true;
+    public boolean isTeaching(Student student) {
+        for (Klass klass : klasses) {
+            if (student.isIn(klass)) {
+                return true;
+            }
         }
         return false;
     }
 
     @Override
-    public void onLeaderAssign(Student student, Klass klass) {
-//        I am Jerry, teacher of Class 2. I know Tom become Leader.
-        if (this.klasses.contains(klass)){
-            System.out.println(String.format("I am %s, teacher of Class %d. I know %s become Leader.", this.getName(), klass.getId(), student.getName()));
-        }
+    public void notifyAssignLeader(Klass klass) {
+        String message = "I am %s, teacher of Class %d. I know %s become Leader."
+                .formatted(name, klass.getNumber(), klass.getLeaderName());
+        System.out.println(message);
     }
 }

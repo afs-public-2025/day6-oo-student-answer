@@ -5,117 +5,99 @@ import oo.Student;
 import oo.Teacher;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TeacherTest {
 
     // when belongsTo give teacher does not teach the class then return false
     @Test
-    public void should_return_false_when_belongsTo_given_teacher_does_not_teach_the_class() {
-        Teacher jerry = new Teacher(1, "Jerry", 21);
-        Klass klass = new Klass(1);
-
-        boolean belongsTo = jerry.belongsTo(klass);
-
-        assertThat(belongsTo).isFalse();
+    void should_return_false_when_belongsTo_given_teacher_not_teach_the_class() {
+        Klass klass1 = new Klass(1);
+        Klass klass2 = new Klass(2);
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        assertFalse(teacher.belongsTo(klass2));
     }
 
     // when belongsTo give teacher teach the class then return true
     @Test
-    public void should_return_true_when_belongsTo_given_teacher_teaches_in_the_class() {
-        Teacher jerry = new Teacher(1, "Jerry", 21);
-        Klass klass = new Klass(1);
-        jerry.assignTo(klass);
-
-        boolean belongsTo = jerry.belongsTo(klass);
-
-        assertThat(belongsTo).isTrue();
+    void should_return_true_when_belongsTo_given_teacher_teach_the_class() {
+        Klass klass1 = new Klass(1);
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        assertTrue(teacher.belongsTo(klass1));
     }
 
     // when belongsTo given teacher teach multiple classes then return true
     @Test
-    public void should_all_return_true_when_belongsTo_given_teacher_teaches_multiple_classes() {
-        Teacher jerry = new Teacher(1, "Jerry", 21);
+    void should_return_true_when_belongsTo_given_teacher_teach_multiple_classes() {
         Klass klass1 = new Klass(1);
         Klass klass2 = new Klass(2);
-        jerry.assignTo(klass1);
-        jerry.assignTo(klass2);
-
-        boolean belongsToKlass1 = jerry.belongsTo(klass1);
-        boolean belongsToKlass2 = jerry.belongsTo(klass2);
-
-        assertThat(belongsToKlass1).isTrue();
-        assertThat(belongsToKlass2).isTrue();
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        teacher.assignTo(klass2);
+        assertTrue(teacher.belongsTo(klass1));
+        assertTrue(teacher.belongsTo(klass2));
     }
 
     //when introduce given teacher teach one class then return message
     @Test
-    public void should_return_message_with_name_age_and_class_when_introduce_given_teacher_teaches_one_class() {
-        Teacher jerry = new Teacher(1, "Jerry", 21);
+    void should_introduce_self_when_introduce_given_teacher_teach_one_class() {
         Klass klass1 = new Klass(1);
-        jerry.assignTo(klass1);
-
-        String introduce = jerry.introduce();
-
-        assertThat(introduce).isEqualTo("My name is Jerry. I am 21 years old. I am a teacher. I teach Class 1.");
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        String expected = "My name is Tom. I am 21 years old. I am a teacher. I teach class 1.";
+        assertEquals(expected, teacher.introduce());
     }
 
     // when introduce given teacher teach multiple classes then return message
     @Test
-    public void should_return_message_with_name_age_and_class_when_introduce_given_teacher_teaches_multiple_classes() {
-        Teacher jerry = new Teacher(1, "Jerry", 21);
-        Klass klass2 = new Klass(2);
-        Klass klass3 = new Klass(3);
-        jerry.assignTo(klass2);
-        jerry.assignTo(klass3);
-
-        String introduce = jerry.introduce();
-
-        assertThat(introduce).isEqualTo("My name is Jerry. I am 21 years old. I am a teacher. I teach Class 2, 3.");
+    void should_introduce_self_when_introduce_given_teacher_teach_multiple_class() {
+        Klass klass1 = new Klass(2);
+        Klass klass2 = new Klass(3);
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        teacher.assignTo(klass2);
+        String expected = "My name is Tom. I am 21 years old. I am a teacher. I teach class 2, 3.";
+        assertEquals(expected, teacher.introduce());
     }
 
     // when isTeaching given student not in the class taught by teacher then should return false
     @Test
-    public void should_return_false_when_isTeaching_given_student_not_in_the_class_taught_by_teacher() {
-        Klass klass1 = new Klass(1);
-        Klass klass2 = new Klass(2);
-        Student tom = new Student(1, "Tom", 18);
-        tom.join(klass1);
-        Teacher jerry = new Teacher(1, "Jerry", 21);
-        jerry.assignTo(klass2);
-
-        boolean isTeaching = jerry.isTeaching(tom);
-
-        assertThat(isTeaching).isFalse();
+    void should_return_false_when_inTeaching_given_teacher_not_teach_a_class() {
+        Klass klass1 = new Klass(2);
+        Klass klass2 = new Klass(3);
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        Student student = new Student(1, "Jerry", 18);
+        student.join(klass2);
+        assertFalse(teacher.isTeaching(student));
     }
 
     // when isTeaching given student in the class taught by teacher then return true
     @Test
-    public void should_return_true_when_isTeaching_given_student_in_the_class_taught_by_teacher() {
-        Klass klass1 = new Klass(1);
-        Student tom = new Student(1, "Tom", 18);
-        tom.join(klass1);
-        Teacher jerry = new Teacher(1, "Jerry", 21);
-        jerry.assignTo(klass1);
-
-        boolean isTeaching = jerry.isTeaching(tom);
-
-        assertThat(isTeaching).isTrue();
+    void should_return_true_when_inTeaching_given_teacher_teach_a_class() {
+        Klass klass1 = new Klass(2);
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        Student student = new Student(1, "Jerry", 18);
+        student.join(klass1);
+        assertTrue(teacher.isTeaching(student));
     }
 
     // when isTeaching given student in any class taught by teacher then return true
     @Test
-    public void should_return_true_when_isTeaching_given_student_in_any_class_taught_by_teacher() {
-        Klass klass1 = new Klass(1);
-        Klass klass2 = new Klass(2);
-        Student tom = new Student(1, "Tom", 18);
-        tom.join(klass2);
-        Teacher jerry = new Teacher(1, "Jerry", 21);
-        jerry.assignTo(klass1);
-        jerry.assignTo(klass2);
-
-        boolean isTeaching = jerry.isTeaching(tom);
-
-        assertThat(isTeaching).isTrue();
+    void should_return_true_when_inTeaching_given_teacher_teach_multiple_classes() {
+        Klass klass1 = new Klass(2);
+        Klass klass2 = new Klass(3);
+        Teacher teacher = new Teacher(1, "Tom", 21);
+        teacher.assignTo(klass1);
+        teacher.assignTo(klass2);
+        Student student1 = new Student(1, "Jerry", 18);
+        student1.join(klass1);
+        Student student2 = new Student(2, "Jim", 19);
+        student2.join(klass2);
+        assertTrue(teacher.isTeaching(student1));
+        assertTrue(teacher.isTeaching(student2));
     }
 }
